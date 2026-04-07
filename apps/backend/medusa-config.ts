@@ -8,6 +8,7 @@ const adminCors = process.env.ADMIN_CORS ?? ""
 const authCors = process.env.AUTH_CORS ?? ""
 const jwtSecret = process.env.JWT_SECRET ?? ""
 const cookieSecret = process.env.COOKIE_SECRET ?? ""
+const disableAdmin = process.env.DISABLE_MEDUSA_ADMIN === "true"
 
 module.exports = defineConfig({
   projectConfig: {
@@ -19,5 +20,8 @@ module.exports = defineConfig({
       jwtSecret,
       cookieSecret,
     },
+  },
+  admin: {
+    disable: disableAdmin,
   },
 })
