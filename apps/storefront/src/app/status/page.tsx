@@ -143,8 +143,8 @@ export default async function StatusPage() {
           <CardHeader>
             <CardTitle>Env contract</CardTitle>
             <CardDescription>
-              The first two keys unlock future storefront API work. The publishable key is
-              intentionally deferred.
+              The backend URLs keep health checks working, and the publishable key now
+              unlocks real product browsing.
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -69,8 +69,8 @@ Do not build, reference, or suggest any of the following unless explicitly instr
 
 ## Current Phase
 
-**Phase:** Phase [whatever phase] - [...]
-**Active task:** [...]
+**Phase:** Phase 1 - Seeded Catalogue & Product Pages
+**Active task:** Keep Git normalization complete as a prerequisite gate, use the live seeded Medusa backend plus publishable key to build `/products` and `/products/[handle]` through `/lib/medusa/`, and add the basic site shell with a header and footer. Both catalogue routes must use ISR with a 60-second revalidation window.
 
 Refer to `docs/build-plan.md` for full phase definitions and done criteria.
 

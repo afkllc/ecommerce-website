@@ -77,9 +77,9 @@ export function getMedusaConfigStatus() {
     ),
     createEntry(
       "MEDUSA_PUBLISHABLE_KEY",
-      "Generated after a Medusa sales channel exists post-deployment. Leave blank during Task 0.",
+      "Required for storefront product browsing after the live Phase 1 Medusa seed creates it.",
       process.env.MEDUSA_PUBLISHABLE_KEY,
-      "deferred"
+      "missing"
     ),
   ]
 

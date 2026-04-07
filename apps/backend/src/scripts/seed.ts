@@ -27,6 +27,40 @@ import {
 } from "@medusajs/medusa/core-flows";
 import { ApiKey } from "../../.medusa/types/query-entry-points";
 
+const pencilProductHandles = [
+  "cedar-classroom-hb-set",
+  "soft-shade-artist-trio",
+  "colour-burst-studio-tin",
+  "watercolour-wash-pencil-pack",
+  "precision-draft-mechanical-pencil",
+  "field-notes-sketch-kit",
+];
+
+function createPlaceholderImage(
+  label: string,
+  background: string,
+  foreground: string
+) {
+  return {
+    url: `https://placehold.co/1200x1600/${background}/${foreground}.png?text=${encodeURIComponent(
+      label
+    )}`,
+  };
+}
+
+function createPricePair(eurAmount: number, usdAmount: number) {
+  return [
+    {
+      amount: eurAmount,
+      currency_code: "eur",
+    },
+    {
+      amount: usdAmount,
+      currency_code: "usd",
+    },
+  ];
+}
+
 const updateStoreCurrencies = createWorkflow(
   "update-store-currencies",
   (input: {
@@ -64,6 +98,33 @@ export default async function seedDemoData({ container }: ExecArgs) {
   const storeModuleService = container.resolve(Modules.STORE);
 
   const countries = ["gb", "de", "dk", "se", "fr", "es", "it"];
+  const { data: existingProducts } = await query.graph({
+    entity: "product",
+    fields: ["handle"],
+  });
+  const existingProductHandles = new Set(
+    (existingProducts ?? []).map((product: { handle: string }) => product.handle)
+  );
+
+  if (
+    pencilProductHandles.every((handle) => existingProductHandles.has(handle))
+  ) {
+    logger.info("Pencil demo products already exist. Skipping duplicate seed run.");
+
+    const { data: existingApiKeys } = await query.graph({
+      entity: "api_key",
+      fields: ["token"],
+      filters: {
+        type: "publishable",
+      },
+    });
+
+    if (existingApiKeys?.[0]?.token) {
+      logger.info(`MEDUSA_PUBLISHABLE_KEY=${existingApiKeys[0].token}`);
+    }
+
+    return;
+  }
 
   logger.info("Seeding store data...");
   const [store] = await storeModuleService.listStores();
@@ -336,7 +397,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   let publishableApiKey: ApiKey | null = null;
   const { data } = await query.graph({
     entity: "api_key",
-    fields: ["id"],
+    fields: ["id", "token", "title"],
     filters: {
       type: "publishable",
     },
@@ -351,7 +412,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       input: {
         api_keys: [
           {
-            title: "Webshop",
+            title: "AllPencils Storefront",
             type: "publishable",
             created_by: "",
           },
@@ -369,6 +430,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     },
   });
   logger.info("Finished seeding publishable API key data.");
+  logger.info(`MEDUSA_PUBLISHABLE_KEY=${publishableApiKey.token}`);
 
   logger.info("Seeding product data...");
 
@@ -378,19 +440,19 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       product_categories: [
         {
-          name: "Shirts",
+          name: "Graphite",
           is_active: true,
         },
         {
-          name: "Sweatshirts",
+          name: "Colour Pencil Sets",
           is_active: true,
         },
         {
-          name: "Pants",
+          name: "Mechanical",
           is_active: true,
         },
         {
-          name: "Merch",
+          name: "Sketch Kits",
           is_active: true,
         },
       ],
@@ -401,186 +463,49 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       products: [
         {
-          title: "Medusa T-Shirt",
+          title: "Cedar Classroom HB Set",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Shirts")!.id,
+            categoryResult.find((cat) => cat.name === "Graphite")!.id,
           ],
           description:
-            "Reimagine the feeling of a classic T-shirt. With our cotton T-shirts, everyday essentials no longer have to be ordinary.",
-          handle: "t-shirt",
-          weight: 400,
+            "A clean twelve-or-twenty-four pack of cedar pencils designed for everyday writing, note taking, and quick sketches at the desk.",
+          handle: "cedar-classroom-hb-set",
+          weight: 180,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-back.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-white-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-white-back.png",
-            },
+            createPlaceholderImage("Cedar Classroom Set", "f5ead6", "3e2d1d"),
+            createPlaceholderImage("HB Core Detail", "efe1cb", "5e4730"),
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
-            },
-            {
-              title: "Color",
-              values: ["Black", "White"],
+              title: "Pack Size",
+              values: ["12 pencils", "24 pencils"],
             },
           ],
           variants: [
             {
-              title: "S / Black",
-              sku: "SHIRT-S-BLACK",
+              title: "12 pencils",
+              sku: "CEDAR-HB-12",
               options: {
-                Size: "S",
-                Color: "Black",
+                "Pack Size": "12 pencils",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(12, 14),
             },
             {
-              title: "S / White",
-              sku: "SHIRT-S-WHITE",
+              title: "24 pencils",
+              sku: "CEDAR-HB-24",
               options: {
-                Size: "S",
-                Color: "White",
+                "Pack Size": "24 pencils",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "M / Black",
-              sku: "SHIRT-M-BLACK",
-              options: {
-                Size: "M",
-                Color: "Black",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "M / White",
-              sku: "SHIRT-M-WHITE",
-              options: {
-                Size: "M",
-                Color: "White",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "L / Black",
-              sku: "SHIRT-L-BLACK",
-              options: {
-                Size: "L",
-                Color: "Black",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "L / White",
-              sku: "SHIRT-L-WHITE",
-              options: {
-                Size: "L",
-                Color: "White",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "XL / Black",
-              sku: "SHIRT-XL-BLACK",
-              options: {
-                Size: "XL",
-                Color: "Black",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "XL / White",
-              sku: "SHIRT-XL-WHITE",
-              options: {
-                Size: "XL",
-                Color: "White",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(22, 26),
             },
           ],
+          metadata: {
+            audience: "students and everyday writers",
+            recommendation_tags: ["graphite", "classroom", "everyday"],
+            story: "The reliable starter set for the AllPencils demo catalogue.",
+          },
           sales_channels: [
             {
               id: defaultSalesChannel[0].id,
@@ -588,100 +513,57 @@ export default async function seedDemoData({ container }: ExecArgs) {
           ],
         },
         {
-          title: "Medusa Sweatshirt",
+          title: "Soft Shade Artist Trio",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Sweatshirts")!.id,
+            categoryResult.find((cat) => cat.name === "Graphite")!.id,
           ],
           description:
-            "Reimagine the feeling of a classic sweatshirt. With our cotton sweatshirt, everyday essentials no longer have to be ordinary.",
-          handle: "sweatshirt",
-          weight: 400,
+            "A studio-friendly graphite trio with softer leads for layering value, gesture drawing, and warm shadow work on textured paper.",
+          handle: "soft-shade-artist-trio",
+          weight: 90,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-back.png",
-            },
+            createPlaceholderImage("Soft Shade Trio", "ede3d3", "34261b"),
+            createPlaceholderImage("Artist Grades", "ddd0bd", "5c4734"),
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
+              title: "Lead Grade",
+              values: ["2B", "4B", "6B"],
             },
           ],
           variants: [
             {
-              title: "S",
-              sku: "SWEATSHIRT-S",
+              title: "2B",
+              sku: "SOFT-SHADE-2B",
               options: {
-                Size: "S",
+                "Lead Grade": "2B",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(8, 10),
             },
             {
-              title: "M",
-              sku: "SWEATSHIRT-M",
+              title: "4B",
+              sku: "SOFT-SHADE-4B",
               options: {
-                Size: "M",
+                "Lead Grade": "4B",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(8, 10),
             },
             {
-              title: "L",
-              sku: "SWEATSHIRT-L",
+              title: "6B",
+              sku: "SOFT-SHADE-6B",
               options: {
-                Size: "L",
+                "Lead Grade": "6B",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "XL",
-              sku: "SWEATSHIRT-XL",
-              options: {
-                Size: "XL",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(9, 11),
             },
           ],
+          metadata: {
+            audience: "artists and illustrators",
+            recommendation_tags: ["graphite", "artist", "shading"],
+            story: "Built for sketchbook sessions and tonal studies.",
+          },
           sales_channels: [
             {
               id: defaultSalesChannel[0].id,
@@ -689,100 +571,49 @@ export default async function seedDemoData({ container }: ExecArgs) {
           ],
         },
         {
-          title: "Medusa Sweatpants",
+          title: "Colour Burst Studio Tin",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Pants")!.id,
+            categoryResult.find((cat) => cat.name === "Colour Pencil Sets")!.id,
           ],
           description:
-            "Reimagine the feeling of classic sweatpants. With our cotton sweatpants, everyday essentials no longer have to be ordinary.",
-          handle: "sweatpants",
-          weight: 400,
+            "A bright colour-pencil tin with rich pigment and a smooth wax core for layering, lettering, and bold product mock-ups.",
+          handle: "colour-burst-studio-tin",
+          weight: 260,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-back.png",
-            },
+            createPlaceholderImage("Colour Burst Tin", "f3dfd0", "512e1f"),
+            createPlaceholderImage("Studio Palette", "ead0c0", "6b4334"),
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
+              title: "Palette",
+              values: ["24 colours", "48 colours"],
             },
           ],
           variants: [
             {
-              title: "S",
-              sku: "SWEATPANTS-S",
+              title: "24 colours",
+              sku: "COLOUR-BURST-24",
               options: {
-                Size: "S",
+                Palette: "24 colours",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(18, 22),
             },
             {
-              title: "M",
-              sku: "SWEATPANTS-M",
+              title: "48 colours",
+              sku: "COLOUR-BURST-48",
               options: {
-                Size: "M",
+                Palette: "48 colours",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "L",
-              sku: "SWEATPANTS-L",
-              options: {
-                Size: "L",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "XL",
-              sku: "SWEATPANTS-XL",
-              options: {
-                Size: "XL",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(30, 36),
             },
           ],
+          metadata: {
+            audience: "designers and hobby colourists",
+            recommendation_tags: ["colour", "studio", "bold"],
+            story: "The vivid everyday colour set for client-facing demos.",
+          },
           sales_channels: [
             {
               id: defaultSalesChannel[0].id,
@@ -790,100 +621,149 @@ export default async function seedDemoData({ container }: ExecArgs) {
           ],
         },
         {
-          title: "Medusa Shorts",
+          title: "Watercolour Wash Pencil Pack",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Merch")!.id,
+            categoryResult.find((cat) => cat.name === "Colour Pencil Sets")!.id,
           ],
           description:
-            "Reimagine the feeling of classic shorts. With our cotton shorts, everyday essentials no longer have to be ordinary.",
-          handle: "shorts",
-          weight: 400,
+            "Water-soluble pencils that move from crisp lines to soft washes, aimed at travel journals and quick atmospheric studies.",
+          handle: "watercolour-wash-pencil-pack",
+          weight: 220,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-back.png",
-            },
+            createPlaceholderImage("Watercolour Wash", "dde8e1", "264236"),
+            createPlaceholderImage("Travel Washes", "c9d9d1", "355447"),
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
+              title: "Palette",
+              values: ["12 colours", "24 colours"],
             },
           ],
           variants: [
             {
-              title: "S",
-              sku: "SHORTS-S",
+              title: "12 colours",
+              sku: "WATERCOLOUR-12",
               options: {
-                Size: "S",
+                Palette: "12 colours",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(16, 19),
             },
             {
-              title: "M",
-              sku: "SHORTS-M",
+              title: "24 colours",
+              sku: "WATERCOLOUR-24",
               options: {
-                Size: "M",
+                Palette: "24 colours",
               },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "L",
-              sku: "SHORTS-L",
-              options: {
-                Size: "L",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "XL",
-              sku: "SHORTS-XL",
-              options: {
-                Size: "XL",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
+              prices: createPricePair(28, 33),
             },
           ],
+          metadata: {
+            audience: "urban sketchers and travel journal users",
+            recommendation_tags: ["colour", "travel", "watercolour"],
+            story: "Made for quick colour blocking and painterly detail.",
+          },
+          sales_channels: [
+            {
+              id: defaultSalesChannel[0].id,
+            },
+          ],
+        },
+        {
+          title: "Precision Draft Mechanical Pencil",
+          category_ids: [
+            categoryResult.find((cat) => cat.name === "Mechanical")!.id,
+          ],
+          description:
+            "A slim drafting pencil with a steady metal grip and dependable click action for diagrams, annotations, and technical notes.",
+          handle: "precision-draft-mechanical-pencil",
+          weight: 80,
+          status: ProductStatus.PUBLISHED,
+          shipping_profile_id: shippingProfile.id,
+          images: [
+            createPlaceholderImage("Precision Draft", "d9dee6", "253243"),
+            createPlaceholderImage("Metal Grip Detail", "c6ccd5", "39495d"),
+          ],
+          options: [
+            {
+              title: "Lead Size",
+              values: ["0.5 mm", "0.7 mm"],
+            },
+          ],
+          variants: [
+            {
+              title: "0.5 mm",
+              sku: "PRECISION-DRAFT-05",
+              options: {
+                "Lead Size": "0.5 mm",
+              },
+              prices: createPricePair(14, 17),
+            },
+            {
+              title: "0.7 mm",
+              sku: "PRECISION-DRAFT-07",
+              options: {
+                "Lead Size": "0.7 mm",
+              },
+              prices: createPricePair(14, 17),
+            },
+          ],
+          metadata: {
+            audience: "architects and technical note-takers",
+            recommendation_tags: ["mechanical", "technical", "precision"],
+            story: "The sharp, modern option in the AllPencils lineup.",
+          },
+          sales_channels: [
+            {
+              id: defaultSalesChannel[0].id,
+            },
+          ],
+        },
+        {
+          title: "Field Notes Sketch Kit",
+          category_ids: [
+            categoryResult.find((cat) => cat.name === "Sketch Kits")!.id,
+          ],
+          description:
+            "A compact sketch kit pairing core pencils with an on-the-go layout, aimed at commuters, cafe sketchers, and client walk-throughs.",
+          handle: "field-notes-sketch-kit",
+          weight: 280,
+          status: ProductStatus.PUBLISHED,
+          shipping_profile_id: shippingProfile.id,
+          images: [
+            createPlaceholderImage("Field Notes Kit", "e6ecf2", "223548"),
+            createPlaceholderImage("Travel Sketch Kit", "d1dae4", "3d5368"),
+          ],
+          options: [
+            {
+              title: "Kit Size",
+              values: ["Travel", "Studio"],
+            },
+          ],
+          variants: [
+            {
+              title: "Travel",
+              sku: "FIELD-NOTES-TRAVEL",
+              options: {
+                "Kit Size": "Travel",
+              },
+              prices: createPricePair(24, 28),
+            },
+            {
+              title: "Studio",
+              sku: "FIELD-NOTES-STUDIO",
+              options: {
+                "Kit Size": "Studio",
+              },
+              prices: createPricePair(32, 38),
+            },
+          ],
+          metadata: {
+            audience: "travelling creatives",
+            recommendation_tags: ["travel", "sketch", "kit"],
+            story: "A portable bundle that rounds out the pencil-shop demo.",
+          },
           sales_channels: [
             {
               id: defaultSalesChannel[0].id,

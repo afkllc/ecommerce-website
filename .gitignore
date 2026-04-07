@@ -2,6 +2,7 @@ node_modules/
 .pnpm-store/
 .turbo/
 .corepack/
+.codex-config/
 .DS_Store
 *.log
 
