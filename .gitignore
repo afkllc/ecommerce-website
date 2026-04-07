@@ -1,0 +1,17 @@
+node_modules/
+.pnpm-store/
+.turbo/
+.corepack/
+.DS_Store
+*.log
+
+.env
+.env.*
+!.env.example
+
+.next/
+coverage/
+dist/
+out/
+build/
+.vercel/
