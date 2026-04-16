@@ -1,7 +1,9 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 
+import { useCart } from "@/components/cart-provider"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/medusa"
 
@@ -27,12 +29,14 @@ export function ProductVariantPicker({
   options,
   variants,
 }: ProductVariantPickerProps) {
+  const { addItem, error, isLoading } = useCart()
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(
     () =>
       Object.fromEntries(
         options.map((option) => [option.title, option.values[0] ?? ""])
       )
   )
+  const [feedback, setFeedback] = useState<string | null>(null)
 
   const selectedVariant = useMemo(() => {
     return (
@@ -44,6 +48,25 @@ export function ProductVariantPicker({
       ) ?? variants[0]
     )
   }, [selectedOptions, variants])
+
+  const isSoldOut =
+    selectedVariant?.manageInventory &&
+    (selectedVariant.inventoryQuantity ?? 0) <= 0
+
+  async function handleAddToCart() {
+    if (!selectedVariant) {
+      return
+    }
+
+    setFeedback(null)
+
+    try {
+      await addItem(selectedVariant.id)
+      setFeedback(`${selectedVariant.title} added to your cart.`)
+    } catch {
+      setFeedback(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -101,9 +124,32 @@ export function ProductVariantPicker({
         </p>
       </div>
 
-      <Button type="button" size="lg" className="w-full" disabled>
-        Add to cart arrives in Phase 2
-      </Button>
+      <div className="space-y-3">
+        <Button
+          type="button"
+          size="lg"
+          className="w-full"
+          disabled={!selectedVariant || isLoading || isSoldOut}
+          onClick={handleAddToCart}
+        >
+          {isSoldOut
+            ? "Out of stock"
+            : isLoading
+              ? "Adding to cart..."
+              : "Add to cart"}
+        </Button>
+        {feedback ? (
+          <p className="text-sm text-primary">
+            {feedback}{" "}
+            <Link href="/cart" className="underline underline-offset-4">
+              View cart
+            </Link>
+          </p>
+        ) : null}
+        {!feedback && error ? (
+          <p className="text-sm text-destructive">{error}</p>
+        ) : null}
+      </div>
     </div>
   )
 }

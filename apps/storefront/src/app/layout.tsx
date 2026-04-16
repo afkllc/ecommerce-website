@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 
+import { CartProvider } from "@/components/cart-provider"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 
@@ -28,17 +29,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const publishableKey = process.env.MEDUSA_PUBLISHABLE_KEY ?? null
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} dark`}
     >
       <body className="bg-background text-foreground antialiased">
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <div className="flex-1">{children}</div>
-          <SiteFooter />
-        </div>
+        <CartProvider publishableKey={publishableKey}>
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <div className="flex-1">{children}</div>
+            <SiteFooter />
+          </div>
+        </CartProvider>
       </body>
     </html>
   )
