@@ -74,7 +74,7 @@
 
 ---
 
-## Phase 3 — Homepage & Simulated AI Features
+## Phase 3 — Homepage, recommendations, and scripted assistant
 
 **Goal:** The storefront looks complete and the AI features are visible and functional.
 
@@ -109,6 +109,7 @@
 - Smooth page transitions and cart animations
 - Final Lighthouse audit — fix any remaining Core Web Vitals issues
 - Clean public Vercel URL confirmed, all environment variables verified in production
+- Discount engine (example discount codes)
 
 **Done criteria:**
 
@@ -116,6 +117,7 @@
 - Lighthouse mobile score ≥ 90 on homepage and one product detail page
 - Zero console errors on any page in the core loop
 - Site accessible at a shareable public URL
+- Discount engine (example discount codes)
 
 **Deferred:** Domain name, SEO metadata beyond basics, admin panel refinement
 
@@ -128,8 +130,11 @@
 - SEO metadata (title, description, Open Graph tags) per page
 - Analytics integration (Google Analytics or similar)
 - Deployment runbook (update step-by-step guide in readme.md for redeploying frontend and backend)
-- Discount engine (example discount codes)
-- Banners (example banners) to show on homepage and product pages, change banner image and text from admin panel if possible, if not, images are set (give me resolution) and banners/images are navigatable to product pages of set product(s) (guide me what to do on my side)
+- Banners and promotional homepage sections
+  - Add reusable homepage/product-page banner blocks with editable text, image, CTA label, and CTA destination.
+  - Prefer admin-editable content through a CMS or custom Medusa admin extension; if that is not implemented, use fixed banner data defined in the codebase.
+  - Ensure each banner links to a product page or collection page.
+  - Provide image size guidance for consistent display.
 
 **Done criteria:**
 
