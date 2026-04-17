@@ -12,11 +12,15 @@ export default async function createAdmin({ container }: ExecArgs) {
   })
 
   await authModule.createAuthIdentities({
-    provider: "emailpass",
-    entity_id: "admin@allpencils.com",
-    provider_metadata: {
-      password: "Admin1234!",
-    },
+    provider_identities: [
+      {
+        provider: "emailpass",
+        entity_id: "admin@allpencils.com",
+        provider_metadata: {
+          password: "Admin1234!",
+        },
+      },
+    ],
   })
 
   console.log("Admin user created:", user)
