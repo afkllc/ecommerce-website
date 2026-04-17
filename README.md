@@ -15,6 +15,10 @@ Task 0 boots the local workspace without pretending the commerce stack is live y
 - `corepack pnpm build:storefront`
 - `corepack pnpm build:backend`
 
+## Admin User
+
+- pnpm medusa user --email [EMAIL_ADDRESS] --password [PASSWORD]
+
 ## Notes
 
 - `MEDUSA_PUBLISHABLE_KEY` stays blank during Task 0. It is created only after a Medusa sales channel exists post-deployment.

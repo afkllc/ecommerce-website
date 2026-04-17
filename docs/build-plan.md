@@ -84,6 +84,7 @@
 - Recommendation logic: a server-side function in `/lib/recommendations.ts` returns related products based on category tag matching; labelled as "Recommended for you" in the UI
 - Shopping assistant widget: fixed-position chat button, opens a chat panel, responses driven by `/data/assistant-script.json`; fallback response for unrecognised input
 - "You might also like" row on each product detail page using the same recommendation function
+- No mention of phases/developer/build-plan in the frontend, should look like a normal ecommerce website
 
 **Done criteria:**
 
@@ -91,6 +92,7 @@
 - Assistant has ≥5 working scripted exchanges and a graceful fallback
 - "AI Picks" strip visible on homepage with at least 3 products
 - No AI API calls in the codebase — everything is rule-based or scripted
+- No mention of phases/developer/build-plan in the frontend, should look like a normal ecommerce website
 
 **Deferred:** Real LLM integration, personalisation based on user history
 
@@ -107,7 +109,6 @@
 - Smooth page transitions and cart animations
 - Final Lighthouse audit — fix any remaining Core Web Vitals issues
 - Clean public Vercel URL confirmed, all environment variables verified in production
-- Brief Medusa Admin walkthrough prepared (show product management UI)
 
 **Done criteria:**
 
@@ -117,3 +118,24 @@
 - Site accessible at a shareable public URL
 
 **Deferred:** Domain name, SEO metadata beyond basics, admin panel refinement
+
+## Phase 5 — Client Handoff Readiness
+
+**Goal:** The site is ready for a client to take over management.
+
+**What gets built:**
+
+- SEO metadata (title, description, Open Graph tags) per page
+- Analytics integration (Google Analytics or similar)
+- Deployment runbook (update step-by-step guide in readme.md for redeploying frontend and backend)
+- Discount engine (example discount codes)
+- Banners (example banners) to show on homepage and product pages, change banner image and text from admin panel if possible, if not, images are set (give me resolution) and banners/images are navigatable to product pages of set product(s) (guide me what to do on my side)
+
+**Done criteria:**
+
+- All Phase 5 items complete and documented
+- Analytics tracking active on the storefront
+- Deployment runbook is clear and executable
+- Banners are set and navigatable to product pages
+
+**Deferred:** User accounts, email notifications, multi-currency support
