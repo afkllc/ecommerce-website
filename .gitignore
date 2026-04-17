@@ -16,3 +16,6 @@ dist/
 out/
 build/
 .vercel/
+
+.vercel
+.env*.local
