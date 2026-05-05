@@ -2,6 +2,23 @@
 
 The `medusa-test-utils` package provides utility functions to create integration tests for your API routes and workflows.
 
+Run HTTP integration tests with:
+
+```bash
+corepack pnpm --filter @allpencils/backend test:integration:http
+```
+
+Tests load `apps/backend/.env.test` through Medusa's test env loader. Do not commit that file. Required values:
+
+```bash
+DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/TEST_DATABASE
+STORE_CORS=http://localhost:3000
+ADMIN_CORS=http://localhost:9000
+AUTH_CORS=http://localhost:3000,http://localhost:9000
+JWT_SECRET=replace-with-test-secret
+COOKIE_SECRET=replace-with-test-secret
+```
+
 For example:
 
 ```ts

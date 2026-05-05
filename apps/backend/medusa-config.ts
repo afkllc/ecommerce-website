@@ -1,13 +1,21 @@
 import { defineConfig, loadEnv } from "@medusajs/framework/utils"
 
-loadEnv(process.env.NODE_ENV || "development", process.cwd())
+import { validateBackendEnv } from "./src/lib/env"
 
-const databaseUrl = process.env.DATABASE_URL ?? ""
-const storeCors = process.env.STORE_CORS ?? ""
-const adminCors = process.env.ADMIN_CORS ?? ""
-const authCors = process.env.AUTH_CORS ?? ""
-const jwtSecret = process.env.JWT_SECRET ?? ""
-const cookieSecret = process.env.COOKIE_SECRET ?? ""
+const nodeEnv = process.env.NODE_ENV || "development"
+const isBuildCommand = process.argv.some((arg) => arg === "build")
+const validationEnv = nodeEnv === "test" || isBuildCommand ? "test" : nodeEnv
+
+loadEnv(nodeEnv, process.cwd())
+
+const {
+  databaseUrl,
+  storeCors,
+  adminCors,
+  authCors,
+  jwtSecret,
+  cookieSecret,
+} = validateBackendEnv(process.env, validationEnv)
 const disableAdmin = process.env.DISABLE_MEDUSA_ADMIN === "true"
 
 module.exports = defineConfig({

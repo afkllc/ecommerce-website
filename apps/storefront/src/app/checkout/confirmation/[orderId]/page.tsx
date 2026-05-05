@@ -42,9 +42,8 @@ export default async function CheckoutConfirmationPage({
               Your demo order is confirmed.
             </h1>
             <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-              The simulated card form passed local validation, the live Medusa cart was
-              completed with the default system payment provider, and the cart session
-              was cleared for the next shopper.
+              The live Medusa cart was completed using available shipping and payment
+              options, and the cart session was cleared for the next shopper.
             </p>
           </div>
         </section>
@@ -96,13 +95,11 @@ export default async function CheckoutConfirmationPage({
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>
-                Standard Shipping was applied automatically using the verified live
-                shipping option name.
+                A live shipping option returned by Medusa was applied automatically.
               </p>
               <p>
-                The checkout used the seeded <span className="font-mono">pp_system_default</span>
-                {" "}payment provider, so no third-party card processor or Stripe client
-                code was involved in this phase.
+                The checkout used an enabled Medusa payment provider, so no raw card
+                data was collected by the storefront in this phase.
               </p>
               {order.items?.length ? (
                 <div className="space-y-3 rounded-2xl border border-border/70 bg-background/50 p-4">

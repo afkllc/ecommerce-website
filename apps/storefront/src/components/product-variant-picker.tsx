@@ -39,16 +39,19 @@ export function ProductVariantPicker({
   const [feedback, setFeedback] = useState<string | null>(null)
 
   const selectedVariant = useMemo(() => {
-    return (
-      variants.find((variant) =>
+    if (!options.length) {
+      return variants[0]
+    }
+
+    return variants.find((variant) =>
         Object.entries(selectedOptions).every(
           ([optionTitle, selectedValue]) =>
             variant.optionValues[optionTitle] === selectedValue
         )
-      ) ?? variants[0]
     )
-  }, [selectedOptions, variants])
+  }, [options.length, selectedOptions, variants])
 
+  const isUnavailable = !selectedVariant
   const isSoldOut =
     selectedVariant?.manageInventory &&
     (selectedVariant.inventoryQuantity ?? 0) <= 0
@@ -88,6 +91,7 @@ export function ProductVariantPicker({
                   type="button"
                   variant={isSelected ? "default" : "outline"}
                   size="sm"
+                  aria-pressed={isSelected}
                   onClick={() =>
                     setSelectedOptions((current) => ({
                       ...current,
@@ -107,18 +111,22 @@ export function ProductVariantPicker({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="text-sm font-medium">
-              {selectedVariant?.title ?? "Selected variant"}
+              {selectedVariant?.title ?? "Selection unavailable"}
             </p>
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
               {selectedVariant?.sku ?? "SKU pending"}
             </p>
           </div>
           <p className="text-lg font-semibold">
-            {formatCurrency(selectedVariant?.priceAmount ?? null, currencyCode)}
+            {selectedVariant
+              ? formatCurrency(selectedVariant.priceAmount, currencyCode)
+              : "Unavailable"}
           </p>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          {selectedVariant?.manageInventory
+          {!selectedVariant
+            ? "Choose a different option combination."
+            : selectedVariant.manageInventory
             ? `${selectedVariant.inventoryQuantity ?? 0} units ready to ship`
             : "Inventory is available for this demo selection."}
         </p>
@@ -129,10 +137,12 @@ export function ProductVariantPicker({
           type="button"
           size="lg"
           className="w-full"
-          disabled={!selectedVariant || isLoading || isSoldOut}
+          disabled={isUnavailable || isLoading || isSoldOut}
           onClick={handleAddToCart}
         >
-          {isSoldOut
+          {!selectedVariant
+            ? "Selection unavailable"
+            : isSoldOut
             ? "Out of stock"
             : isLoading
               ? "Adding to cart..."

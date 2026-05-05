@@ -34,10 +34,6 @@ type CheckoutFormValues = {
   city: string
   postalCode: string
   countryCode: string
-  cardholder: string
-  cardNumber: string
-  expiry: string
-  cvc: string
 }
 
 const EMPTY_FORM: CheckoutFormValues = {
@@ -49,10 +45,6 @@ const EMPTY_FORM: CheckoutFormValues = {
   city: "",
   postalCode: "",
   countryCode: "",
-  cardholder: "",
-  cardNumber: "",
-  expiry: "",
-  cvc: "",
 }
 
 export default function CheckoutPage() {
@@ -77,10 +69,6 @@ export default function CheckoutPage() {
       postalCode: cart.shipping_address?.postal_code ?? "",
       countryCode:
         cart.shipping_address?.country_code ?? cart.region?.countries?.[0]?.iso_2 ?? "",
-      cardholder: "",
-      cardNumber: "",
-      expiry: "",
-      cvc: "",
     })
     setHydratedCartId(cart.id)
   }, [cart, hydratedCartId])
@@ -96,8 +84,6 @@ export default function CheckoutPage() {
   }
 
   function validateCheckout() {
-    const normalizedCardNumber = formValues.cardNumber.replace(/\s+/g, "")
-
     if (
       !formValues.firstName ||
       !formValues.lastName ||
@@ -108,22 +94,6 @@ export default function CheckoutPage() {
       !formValues.countryCode
     ) {
       return "Complete the required contact and address fields before placing the order."
-    }
-
-    if (!formValues.cardholder) {
-      return "Add the simulated cardholder name to continue."
-    }
-
-    if (!/^\d{16}$/.test(normalizedCardNumber)) {
-      return "Use a 16-digit simulated card number."
-    }
-
-    if (!/^\d{2}\/\d{2}$/.test(formValues.expiry)) {
-      return "Use an expiry in MM/YY format."
-    }
-
-    if (!/^\d{3,4}$/.test(formValues.cvc)) {
-      return "Use a 3 or 4 digit simulated CVC."
     }
 
     return null
@@ -213,16 +183,16 @@ export default function CheckoutPage() {
         <div className="flex flex-wrap gap-2">
           <Badge>Phase 2</Badge>
           <Badge variant="secondary">Checkout</Badge>
-          <Badge variant="secondary">Simulated card form</Badge>
+          <Badge variant="secondary">No card collection</Badge>
         </div>
         <div className="space-y-2">
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
             Complete the demo checkout.
           </h1>
           <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-            This form validates contact details locally, auto-applies the verified
-            Standard Shipping option, initializes the default Medusa system payment,
-            and completes a real order without sending card data anywhere.
+            This form validates contact details locally, applies an available live
+            shipping option, initializes an enabled Medusa payment provider, and
+            completes the order without collecting card data.
           </p>
         </div>
       </section>
@@ -331,51 +301,17 @@ export default function CheckoutPage() {
 
           <Card className="border-border/70 bg-card/90">
             <CardHeader>
-              <CardTitle>Simulated card details</CardTitle>
+              <CardTitle>Payment</CardTitle>
               <CardDescription>
-                Demo only. No real payment data is processed or sent to Stripe in this
-                phase.
+                Card details are not collected in this phase. Payment is initialized
+                through the enabled provider returned by Medusa for this cart region.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="cardholder">Cardholder name</Label>
-                <Input
-                  id="cardholder"
-                  value={formValues.cardholder}
-                  onChange={(event) => updateField("cardholder", event.target.value)}
-                  placeholder="Ada Pencil"
-                />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="cardNumber">Card number</Label>
-                <Input
-                  id="cardNumber"
-                  inputMode="numeric"
-                  value={formValues.cardNumber}
-                  onChange={(event) => updateField("cardNumber", event.target.value)}
-                  placeholder="4242424242424242"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="expiry">Expiry</Label>
-                <Input
-                  id="expiry"
-                  value={formValues.expiry}
-                  onChange={(event) => updateField("expiry", event.target.value)}
-                  placeholder="12/34"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cvc">CVC</Label>
-                <Input
-                  id="cvc"
-                  inputMode="numeric"
-                  value={formValues.cvc}
-                  onChange={(event) => updateField("cvc", event.target.value)}
-                  placeholder="123"
-                />
-              </div>
+            <CardContent>
+              <p className="text-sm leading-6 text-muted-foreground">
+                Order placement continues only after Medusa returns a shipping option
+                and an enabled payment provider for the cart.
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -384,8 +320,7 @@ export default function CheckoutPage() {
           <CardHeader>
             <CardTitle>Order summary</CardTitle>
             <CardDescription>
-              Standard Shipping is auto-applied during submission using the verified live
-              shipping option name.
+              Shipping and payment are selected from the live options returned by Medusa.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -408,7 +343,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Shipping</span>
-              <span>Standard Shipping added on submit</span>
+              <span>Added on submit</span>
             </div>
             <div className="flex items-center justify-between border-t border-border/70 pt-4 text-base font-semibold">
               <span>Total after checkout</span>

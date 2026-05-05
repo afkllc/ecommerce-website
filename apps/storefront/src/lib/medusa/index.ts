@@ -2,8 +2,6 @@ export { getMedusaConfigStatus } from "./config"
 export { getMedusaHealthStatus } from "./health"
 export {
   CART_STORAGE_KEY,
-  DEFAULT_PAYMENT_PROVIDER_ID,
-  DEFAULT_SHIPPING_OPTION_NAME,
   MedusaStorefrontError,
   addLineItem,
   applyShippingMethod,
@@ -19,6 +17,7 @@ export {
   prepareManualPayment,
   removeLineItem,
   retrieveCart,
+  selectCartShippingOption,
   setCartAddresses,
   setCartEmail,
   setCartId,

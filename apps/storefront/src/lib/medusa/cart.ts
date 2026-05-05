@@ -1,11 +1,11 @@
 import { formatCurrency } from "./store"
 
 export const CART_STORAGE_KEY = "allpencils_cart_id"
-export const DEFAULT_SHIPPING_OPTION_NAME = "Standard Shipping"
-export const DEFAULT_PAYMENT_PROVIDER_ID = "pp_system_default"
 
 type CartClientConfig = {
   publishableKey?: string | null
+  paymentProviderId?: string | null
+  shippingOptionName?: string | null
 }
 
 type StoreRegionsResponse = {
@@ -199,6 +199,52 @@ function getPublishableKey(config?: CartClientConfig) {
   }
 
   return null
+}
+
+function getConfiguredPaymentProviderId(config?: CartClientConfig) {
+  const configuredValue =
+    config?.paymentProviderId?.trim() ??
+    process.env.NEXT_PUBLIC_MEDUSA_PAYMENT_PROVIDER_ID?.trim()
+
+  return configuredValue || null
+}
+
+function getConfiguredShippingOptionName(config?: CartClientConfig) {
+  const configuredValue =
+    config?.shippingOptionName?.trim() ??
+    process.env.NEXT_PUBLIC_MEDUSA_SHIPPING_OPTION_NAME?.trim()
+
+  return configuredValue || null
+}
+
+export function selectCartShippingOption(
+  options: StoreShippingOption[],
+  config?: CartClientConfig
+) {
+  const configuredName = getConfiguredShippingOptionName(config)
+
+  if (configuredName) {
+    return options.find((option) => option.name === configuredName) ?? null
+  }
+
+  return options[0] ?? null
+}
+
+function selectPaymentProvider(
+  providers: StorePaymentProvider[],
+  config?: CartClientConfig
+) {
+  const enabledProviders = providers.filter((provider) => provider.is_enabled)
+  const configuredProviderId = getConfiguredPaymentProviderId(config)
+
+  if (configuredProviderId) {
+    return (
+      enabledProviders.find((provider) => provider.id === configuredProviderId) ??
+      null
+    )
+  }
+
+  return enabledProviders[0] ?? null
 }
 
 async function getErrorMessage(response: Response) {
@@ -536,10 +582,11 @@ export async function prepareManualPayment(
   config?: CartClientConfig
 ) {
   const providers = await listPaymentProviders(cart.region_id, config)
+  const paymentProvider = selectPaymentProvider(providers, config)
 
-  if (!providers.some((provider) => provider.id === DEFAULT_PAYMENT_PROVIDER_ID)) {
+  if (!paymentProvider) {
     throw new MedusaStorefrontError(
-      "The default system payment provider is not enabled for this region."
+      "No enabled Medusa payment provider is available for this region."
     )
   }
 
@@ -551,7 +598,7 @@ export async function prepareManualPayment(
         config,
         method: "POST",
         body: {
-          provider_id: DEFAULT_PAYMENT_PROVIDER_ID,
+          provider_id: paymentProvider.id,
         },
       }
     )

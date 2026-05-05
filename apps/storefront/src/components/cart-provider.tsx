@@ -5,13 +5,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react"
 
 import {
   CART_STORAGE_KEY,
-  DEFAULT_SHIPPING_OPTION_NAME,
   MedusaStorefrontError,
   addLineItem,
   applyShippingMethod,
@@ -23,6 +23,7 @@ import {
   prepareManualPayment,
   removeLineItem,
   retrieveCart,
+  selectCartShippingOption,
   setCartAddresses,
   setCartEmail,
   updateLineItem,
@@ -74,9 +75,12 @@ export function CartProvider({
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const config = {
-    publishableKey,
-  }
+  const config = useMemo(
+    () => ({
+      publishableKey,
+    }),
+    [publishableKey]
+  )
 
   const refreshCart = useCallback(async () => {
     const cartId = getCartId()
@@ -123,7 +127,7 @@ export function CartProvider({
     } finally {
       setIsLoading(false)
     }
-  }, [publishableKey])
+  }, [config, publishableKey])
 
   async function addItem(variantId: string, quantity = 1) {
     setIsLoading(true)
@@ -223,22 +227,24 @@ export function CartProvider({
       )
 
       const shippingOptions = await listCartShippingOptions(config)
-      const defaultShippingOption = shippingOptions.find(
-        (option) => option.name === DEFAULT_SHIPPING_OPTION_NAME
+      const selectedShippingOption = selectCartShippingOption(
+        shippingOptions,
+        config
       )
 
-      if (!defaultShippingOption) {
-        throw new Error(
-          `The default shipping option "${DEFAULT_SHIPPING_OPTION_NAME}" is unavailable.`
-        )
+      if (!selectedShippingOption) {
+        throw new Error("No live shipping option is available for this cart.")
       }
 
       if (
         !workingCart.shipping_methods.some(
-          (method) => method.shipping_option_id === defaultShippingOption.id
+          (method) => method.shipping_option_id === selectedShippingOption.id
         )
       ) {
-        workingCart = await applyShippingMethod(defaultShippingOption.id, config)
+        workingCart = await applyShippingMethod(
+          selectedShippingOption.id,
+          config
+        )
       }
 
       await prepareManualPayment(workingCart, config)
