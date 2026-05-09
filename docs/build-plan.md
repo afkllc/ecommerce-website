@@ -2,7 +2,7 @@
 
 This plan tracks the demo storefront as it exists today and the safest next work. Code truth wins over this document when they disagree.
 
-Current stage: **Phase 3 - homepage, simulated recommendations, scripted assistant**.
+Current stage: **Phase 4 - visual polish and production readiness**.
 
 ## Phase 0 - Foundation
 
@@ -82,26 +82,27 @@ Done criteria:
 
 ## Phase 3 - Homepage, Simulated Recommendations, Assistant
 
-Status: next.
+Status: implemented on 2026-05-09; keep regression checks running.
 
 Current homepage truth:
-- Homepage still uses the bootstrap page.
-- It is not the final hero/featured-products/recommendations experience.
+- Homepage is implemented in `apps/storefront/src/app/page.tsx`.
+- Homepage data lives in `apps/storefront/src/data/homepage.ts`.
+- Scripted assistant data lives in `apps/storefront/src/data/assistant-script.ts`.
+- Recommendation helpers live in `apps/storefront/src/lib/recommendations.ts`.
+- Homepage product data still comes through `apps/storefront/src/lib/medusa`.
+- Product detail pages include related product recommendations.
 
-Planned work:
-- Replace bootstrap homepage with final demo storefront homepage.
-- Add simulated recommendation logic after Phase 2 is verified.
-- Add scripted shopping assistant after Phase 2 is verified.
-- Keep all simulated AI local, static, or rule-based.
-- Do not add real AI API calls.
-- Build as a restrained Tailwind CSS and shadcn/ui template system.
-- Position the demo as a specialist pencil store for Artist, School, and Work use cases.
-- Add only light Phase 3 motion unless animation dependencies are explicitly approved.
+Done:
+- Replaced bootstrap homepage with a reusable Tailwind CSS and shadcn/ui storefront homepage.
+- Added rule-based recommendations for Artist, School, and Work use cases.
+- Added product-detail related recommendations.
+- Added a scripted/static shopping assistant with no external AI API calls.
+- Kept simulated assistant/recommendation copy outside route components where practical.
+- Kept Phase 3 motion light with existing CSS/Tailwind patterns only.
 
 Guardrails:
 - Add new data/script files only when implementing the feature.
 - Do not hardcode assistant copy inside components.
-- Do not claim recommendation or assistant modules exist before they are created.
 - Keep Medusa data fetching inside the service layer.
 - Use `next/font/google` for Google Fonts if typography changes are needed.
 - Do not add Framer Motion, GSAP, Three.js, or Spline dependencies without explicit approval.
@@ -115,7 +116,7 @@ Done criteria:
 
 ## Phase 4 - Visual Polish & Production Readiness
 
-Status: future.
+Status: next.
 
 Scope:
 - Responsive QA.
@@ -169,21 +170,22 @@ Done criteria:
 ```text
 Start at repo root. Read AGENTS.md first and follow it strictly.
 
-Mission: start Phase 3 by building the final storefront homepage, deterministic simulated recommendations, and a scripted shopping assistant. Do not add real AI API calls.
+Mission: start Phase 4 polish and production readiness for the implemented storefront homepage, recommendations, and scripted assistant. Do not add new features unless explicitly approved.
 
 Scope:
 1. Preserve existing dirty work; do not revert user changes.
-2. Replace the bootstrap homepage with a polished reusable storefront homepage.
-3. Add deterministic simulated recommendations only after reading existing product/cart data patterns.
-4. Add a scripted/static shopping assistant without external AI calls.
-5. Keep Medusa API calls inside `apps/storefront/src/lib/medusa`.
-6. Keep simulated AI copy/data outside components where practical.
+2. Review the implemented homepage, recommendation rails, product detail recommendations, and scripted assistant.
+3. Polish responsive layout, accessibility, copy, and empty/error states without changing checkout behavior.
+4. Keep Medusa API calls inside `apps/storefront/src/lib/medusa`.
+5. Keep simulated AI local/static/rule-based; do not add real AI API calls.
+6. Do not add GSAP, Framer Motion, Three.js, Spline, or new dependencies without explicit approval.
 7. Run required checks:
    - git status --short
    - corepack pnpm --filter @allpencils/storefront lint
    - corepack pnpm --filter @allpencils/storefront typecheck
    - corepack pnpm --filter @allpencils/storefront build
-8. Report changed files, verification, and any blockers.
+8. Browser-check desktop and mobile core routes where possible.
+9. Report changed files, verification, and any blockers.
 
 No new dependencies without asking. No real AI API calls. No secrets in output.
 ```
