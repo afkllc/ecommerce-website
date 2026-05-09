@@ -68,6 +68,6 @@ export const assistantTeaser = {
   eyebrow: "Guided shopping",
   title: "Not sure where to start?",
   description:
-    "Answer one quick prompt and get a scripted starting point for art, school, or work.",
+    "Answer one quick prompt and get a practical starting point for art, school, or work.",
   cta: "Open pencil guide",
 }
