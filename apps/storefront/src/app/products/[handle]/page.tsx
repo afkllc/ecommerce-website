@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react"
 import { notFound } from "next/navigation"
 
 import { ProductVariantPicker } from "@/components/product-variant-picker"
+import { RecommendationRail } from "@/components/storefront/recommendations/recommendation-rail"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,7 +21,9 @@ import {
   getStoreProductByHandle,
   getProductPrimaryImage,
   getProductPrice,
+  listStoreProducts,
 } from "@/lib/medusa"
+import { getRelatedProducts } from "@/lib/recommendations"
 
 export const revalidate = MEDUSA_STORE_REVALIDATE_SECONDS
 
@@ -64,6 +67,9 @@ export default async function ProductDetailPage({
   }
 
   const { data: product, region } = productResult
+  const catalogue = await listStoreProducts()
+  const relatedProducts =
+    catalogue.status === "ready" ? getRelatedProducts(product, catalogue.data, 3) : []
   const image = getProductPrimaryImage(product)
   const category = product.categories?.[0]?.name ?? "Pencil"
 
@@ -181,6 +187,14 @@ export default async function ProductDetailPage({
           </Card>
         </div>
       </section>
+
+      <RecommendationRail
+        eyebrow="You might also like"
+        title="Related pencils for the same kind of work."
+        description="Selected from similar catalogue signals and product categories."
+        products={relatedProducts}
+        currencyCode={region.currency_code}
+      />
     </main>
   )
 }
