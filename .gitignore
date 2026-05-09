@@ -3,6 +3,7 @@ node_modules/
 .turbo/
 .corepack/
 .codex-config/
+.superpowers/
 .DS_Store
 *.log
 

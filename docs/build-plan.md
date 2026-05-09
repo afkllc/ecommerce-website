@@ -94,12 +94,17 @@ Planned work:
 - Add scripted shopping assistant after Phase 2 is verified.
 - Keep all simulated AI local, static, or rule-based.
 - Do not add real AI API calls.
+- Build as a restrained Tailwind CSS and shadcn/ui template system.
+- Position the demo as a specialist pencil store for Artist, School, and Work use cases.
+- Add only light Phase 3 motion unless animation dependencies are explicitly approved.
 
 Guardrails:
 - Add new data/script files only when implementing the feature.
 - Do not hardcode assistant copy inside components.
 - Do not claim recommendation or assistant modules exist before they are created.
 - Keep Medusa data fetching inside the service layer.
+- Use `next/font/google` for Google Fonts if typography changes are needed.
+- Do not add Framer Motion, GSAP, Three.js, or Spline dependencies without explicit approval.
 
 Done criteria:
 - Homepage feels demo-ready and not like an internal build scaffold.
@@ -120,6 +125,8 @@ Scope:
 - Image optimization.
 - SEO/meta basics.
 - Remove internal/demo-only UI language.
+- Richer motion and 3D polish, if approved.
+- Framer Motion for UI animation, GSAP for complex timelines, Spline for art-directed 3D, and Three.js for custom interactive 3D.
 
 Out of scope unless explicitly requested:
 - Live payments.

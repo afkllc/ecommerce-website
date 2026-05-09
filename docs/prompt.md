@@ -45,6 +45,7 @@ Verified in `C:\Users\saqla\Documents\ecommerce-website`:
 - `corepack pnpm --filter @allpencils/backend build` - passed; local build used fake Redis because `REDIS_URL` was absent
 - `corepack pnpm --filter @allpencils/backend test:integration:http` - passed against disposable local Docker Postgres
 - Live no-card checkout smoke test against the Render Medusa backend - passed after Render cold start
+- Storefront rebuild design is documented in `docs/superpowers/specs/2026-05-09-storefront-rebuild-design.md`.
 
 ## Next Developer-Agent Prompt
 
@@ -60,12 +61,15 @@ Scope:
 4. Add a scripted/static shopping assistant without external AI calls.
 5. Keep Medusa API calls inside `apps/storefront/src/lib/medusa`.
 6. Keep simulated AI copy/data outside components where practical.
-7. Run:
+7. Use the approved design in `docs/superpowers/specs/2026-05-09-storefront-rebuild-design.md`.
+8. Keep Phase 3 motion light unless dependencies are explicitly approved. Save GSAP, Framer Motion, Three.js, and Spline work for Phase 4 unless approval changes.
+9. Use `next/font/google` for Google Fonts if typography changes are needed.
+10. Run:
    - git status --short
    - corepack pnpm --filter @allpencils/storefront lint
    - corepack pnpm --filter @allpencils/storefront typecheck
    - corepack pnpm --filter @allpencils/storefront build
-8. Report changed files, verification, and any blockers.
+11. Report changed files, verification, and any blockers.
 
 No new dependencies without asking. No real AI API calls. No secrets in output.
 ```
