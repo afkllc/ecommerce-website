@@ -146,7 +146,7 @@ export default function CheckoutPage() {
           <CardHeader>
             <CardTitle>Loading checkout</CardTitle>
             <CardDescription>
-              Reconnecting to your saved cart before we place the demo order.
+              Reconnecting to your saved cart before order placement.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -161,7 +161,7 @@ export default function CheckoutPage() {
           <CardHeader>
             <CardTitle>Checkout needs a cart</CardTitle>
             <CardDescription>
-              Add at least one product before using the simulated checkout flow.
+              Add at least one product before using checkout.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
@@ -181,18 +181,16 @@ export default function CheckoutPage() {
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12 sm:px-10">
       <section className="space-y-4">
         <div className="flex flex-wrap gap-2">
-          <Badge>Phase 2</Badge>
           <Badge variant="secondary">Checkout</Badge>
           <Badge variant="secondary">No card collection</Badge>
         </div>
         <div className="space-y-2">
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-            Complete the demo checkout.
+            Complete checkout.
           </h1>
           <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-            This form validates contact details locally, applies an available live
-            shipping option, initializes an enabled Medusa payment provider, and
-            completes the order without collecting card data.
+            Enter contact and delivery details. The store applies an available
+            shipping option and completes the order without collecting card data.
           </p>
         </div>
       </section>
@@ -206,7 +204,7 @@ export default function CheckoutPage() {
             <CardHeader>
               <CardTitle>Contact details</CardTitle>
               <CardDescription>
-                These details are saved to the Medusa cart before checkout completes.
+                These details are saved to your cart before checkout completes.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -242,7 +240,7 @@ export default function CheckoutPage() {
             <CardHeader>
               <CardTitle>Shipping address</CardTitle>
               <CardDescription>
-                Country choices are limited to the seeded Medusa region for this demo.
+                Country choices are limited to the active delivery region.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -303,14 +301,14 @@ export default function CheckoutPage() {
             <CardHeader>
               <CardTitle>Payment</CardTitle>
               <CardDescription>
-                Card details are not collected in this phase. Payment is initialized
-                through the enabled provider returned by Medusa for this cart region.
+                Card details are not collected. Payment is initialized through an
+                enabled provider for this cart region.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm leading-6 text-muted-foreground">
-                Order placement continues only after Medusa returns a shipping option
-                and an enabled payment provider for the cart.
+                Order placement continues only after a shipping option and enabled
+                payment provider are available for the cart.
               </p>
             </CardContent>
           </Card>
@@ -320,7 +318,7 @@ export default function CheckoutPage() {
           <CardHeader>
             <CardTitle>Order summary</CardTitle>
             <CardDescription>
-              Shipping and payment are selected from the live options returned by Medusa.
+              Shipping and payment are selected from available checkout options.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -330,7 +328,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <p className="font-medium">{item.title}</p>
                     <p className="text-muted-foreground">
-                      {item.variant_title ?? "Demo variant"} x {item.quantity}
+                      {item.variant_title ?? "Selected variant"} x {item.quantity}
                     </p>
                   </div>
                   <p>{formatCartMoney(item.total ?? item.unit_price, cart.currency_code)}</p>
@@ -347,7 +345,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex items-center justify-between border-t border-border/70 pt-4 text-base font-semibold">
               <span>Total after checkout</span>
-              <span>Calculated by Medusa on order placement</span>
+              <span>Calculated on order placement</span>
             </div>
             {formError ? (
               <p className="text-sm text-destructive">{formError}</p>
@@ -356,7 +354,7 @@ export default function CheckoutPage() {
               <p className="text-sm text-destructive">{error}</p>
             ) : null}
             <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-              {isLoading ? "Placing order..." : "Place Demo Order"}
+              {isLoading ? "Placing order..." : "Place order"}
             </Button>
             <Button asChild type="button" variant="outline" className="w-full">
               <Link href="/cart">Back to cart</Link>

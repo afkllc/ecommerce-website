@@ -21,17 +21,17 @@ export default async function ProductsPage() {
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 sm:px-10">
       <section className="space-y-4">
         <div className="flex flex-wrap gap-2">
-          <Badge>Phase 1</Badge>
-          <Badge variant="secondary">Catalogue</Badge>
-          <Badge variant="secondary">ISR 60s</Badge>
+          <Badge>Catalogue</Badge>
+          <Badge variant="secondary">Pencils</Badge>
+          <Badge variant="secondary">Stationery</Badge>
         </div>
         <div className="space-y-3">
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-            Pencil tools with a clean, client-ready storefront shell.
+            Pencils selected for smooth writing and careful sketching.
           </h1>
           <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-            This catalogue is powered by Medusa through the storefront service layer,
-            with static generation and revalidation for a fast demo experience.
+            Compare everyday graphite, color, and specialty options before adding
+            your favorites to the cart.
           </p>
         </div>
       </section>
@@ -51,7 +51,7 @@ export default async function ProductsPage() {
           <CardHeader>
             <CardTitle>Catalogue unavailable</CardTitle>
             <CardDescription>
-              The storefront could not load product data from Medusa yet.
+              The storefront could not load product data yet.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">

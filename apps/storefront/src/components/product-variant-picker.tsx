@@ -128,7 +128,7 @@ export function ProductVariantPicker({
             ? "Choose a different option combination."
             : selectedVariant.manageInventory
             ? `${selectedVariant.inventoryQuantity ?? 0} units ready to ship`
-            : "Inventory is available for this demo selection."}
+            : "Inventory is available for this selection."}
         </p>
       </div>
 

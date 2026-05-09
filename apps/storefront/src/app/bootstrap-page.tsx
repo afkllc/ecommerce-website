@@ -1,11 +1,5 @@
 import Link from "next/link"
-import {
-  ArrowRight,
-  FolderKanban,
-  PackageCheck,
-  PencilLine,
-  ServerCog,
-} from "lucide-react"
+import { ArrowRight, PackageCheck, Pencil, ShoppingBag, Truck } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -17,55 +11,42 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { getMedusaConfigStatus } from "@/lib/medusa"
 
 const summaryItems = [
   {
-    title: "Workspace",
-    description: "One root repo now owns the storefront, backend, and shared setup notes.",
-    icon: FolderKanban,
+    title: "Everyday pencils",
+    description: "Reliable graphite, color, and sketching tools for home, studio, and school.",
+    icon: Pencil,
   },
   {
-    title: "Storefront",
-    description: "Next.js 14 now renders a real Medusa-backed catalogue with ISR.",
+    title: "Fast browsing",
+    description: "A clean product catalogue makes it easy to compare options and choose quickly.",
     icon: PackageCheck,
   },
   {
-    title: "Backend",
-    description: "Medusa v2 is seeded with a six-product pencil demo on the live backend.",
-    icon: ServerCog,
+    title: "Simple checkout",
+    description: "Cart, delivery details, and order placement stay focused and card-free.",
+    icon: Truck,
   },
 ]
 
-function renderStatusLabel(isReady: boolean, missingLabel: string) {
-  if (isReady) {
-    return <Badge variant="secondary">Configured</Badge>
-  }
-
-  return <Badge variant="outline">{missingLabel}</Badge>
-}
-
 export default function BootstrapPage() {
-  const config = getMedusaConfigStatus()
-
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-6 py-16 sm:px-10">
       <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-6">
           <div className="flex flex-wrap gap-2">
-            <Badge>Phase 1</Badge>
-            <Badge variant="secondary">Catalogue</Badge>
-            <Badge variant="secondary">Medusa Store API</Badge>
-            <Badge variant="secondary">ISR 60s</Badge>
+            <Badge>AllPencils</Badge>
+            <Badge variant="secondary">Stationery</Badge>
+            <Badge variant="secondary">Ready to ship</Badge>
           </div>
           <div className="space-y-4">
             <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-              AllPencils now ships a live pencil catalogue with room to grow into a client template.
+              Pencils for sharper notes, sketches, and everyday ideas.
             </h1>
             <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-              The storefront can now browse seeded Medusa products end-to-end through the
-              service layer. This phase keeps the shell lean while the cart and homepage
-              storytelling stay scoped for later work.
+              Browse a focused range of writing and drawing tools, add favorites to
+              your cart, and place an order without entering card details.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -76,9 +57,9 @@ export default function BootstrapPage() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/status">
-                Review environment status
-                <PencilLine className="size-4" />
+              <Link href="/cart">
+                View cart
+                <ShoppingBag className="size-4" />
               </Link>
             </Button>
           </div>
@@ -86,34 +67,16 @@ export default function BootstrapPage() {
 
         <Card className="border-border/70 bg-card/90">
           <CardHeader>
-            <CardTitle>Storefront snapshot</CardTitle>
+            <CardTitle>Order at your pace</CardTitle>
             <CardDescription>
-              The catalogue stays data-driven, and the env contract still makes it easy to
-              see what is powering the live store.
+              Keep browsing, review quantities, and complete checkout when your cart
+              feels right.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-background/70 p-3">
-              <div>
-                <p className="font-medium">Server-side Medusa URL</p>
-                <p className="text-sm text-muted-foreground">Used by the storefront service layer.</p>
-              </div>
-              {renderStatusLabel(config.canAttemptServerCalls, "Missing")}
-            </div>
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-background/70 p-3">
-              <div>
-                <p className="font-medium">Client-safe Medusa URL</p>
-                <p className="text-sm text-muted-foreground">Reserved for future browser cart flows.</p>
-              </div>
-              {renderStatusLabel(config.canAttemptBrowserCalls, "Missing")}
-            </div>
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-background/70 p-3">
-              <div>
-                <p className="font-medium">Publishable key</p>
-                <p className="text-sm text-muted-foreground">Required for live product browsing.</p>
-              </div>
-              {renderStatusLabel(config.hasPublishableKey, "Missing")}
-            </div>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p>Products stay organized by use, price, and variant.</p>
+            <p>Cart totals update as you adjust quantities.</p>
+            <p>Checkout collects only contact and delivery details.</p>
           </CardContent>
         </Card>
       </section>

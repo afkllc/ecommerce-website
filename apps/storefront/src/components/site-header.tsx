@@ -26,9 +26,6 @@ export function SiteHeader() {
           <Button asChild variant="ghost" size="sm">
             <Link href="/products">Products</Link>
           </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/status">Status</Link>
-          </Button>
           <Button asChild variant="outline" size="icon-sm">
             <Link href="/cart" aria-label={`Cart with ${itemCount} item${itemCount === 1 ? "" : "s"}`}>
               <span className="relative">

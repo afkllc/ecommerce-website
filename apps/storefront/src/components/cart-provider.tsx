@@ -253,7 +253,7 @@ export function CartProvider({
 
       if (completion.type !== "order") {
         throw new Error(
-          completion.error?.message ?? "Medusa could not complete the cart."
+          completion.error?.message ?? "The cart could not be completed."
         )
       }
 

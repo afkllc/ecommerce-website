@@ -52,7 +52,7 @@ export default async function ProductDetailPage({
           <CardHeader>
             <CardTitle>Product unavailable</CardTitle>
             <CardDescription>
-              The storefront could not load this Medusa product yet.
+              The storefront could not load this product yet.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
@@ -165,9 +165,9 @@ export default async function ProductDetailPage({
 
           <Card className="border-border/70 bg-card/90">
             <CardHeader>
-              <CardTitle>Why it fits this demo</CardTitle>
+              <CardTitle>Good fit for</CardTitle>
               <CardDescription>
-                A product detail layout ready for client branding and real cart logic later.
+                Useful context to help you choose the right pencil for the job.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
@@ -175,8 +175,7 @@ export default async function ProductDetailPage({
                 Audience: {product.metadata?.audience ?? "General stationery shoppers"}
               </p>
               <p>
-                Route uses ISR with a 60-second revalidation window for fast catalogue
-                browsing.
+                Add the preferred variant to your cart when you are ready.
               </p>
             </CardContent>
           </Card>

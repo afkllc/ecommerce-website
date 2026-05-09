@@ -1,146 +1,182 @@
-# AllPencils — Phased Build Plan
+# AllPencils Build Plan
 
----
+This plan tracks the demo storefront as it exists today and the safest next work. Code truth wins over this document when they disagree.
 
-## Phase 0 — Environment Setup
+Current stage: **Phase 3 - homepage, simulated recommendations, scripted assistant**.
 
-**Goal:** All tools installed and a working blank storefront is deployed to Vercel with a Medusa backend deployed to Render and PostgreSQL provided by Neon.
+## Phase 0 - Foundation
 
-**What gets built:**
+Status: complete enough for current work.
 
-- Node.js, pnpm, and Medusa CLI installed locally
-- Medusa v2 backend initialised, connected to a Neon PostgreSQL instance, and deployed to Render
-- Next.js 14 (TypeScript, App Router, Tailwind, shadcn/ui) project scaffolded and deployed to Vercel
-- Environment variables configured in Render and Vercel, using the Neon database connection string
-- Frontend successfully fetches from the Medusa API (confirm with a `/health` check rendered on a test page)
+Done:
+- Monorepo layout with `apps/storefront` and `apps/backend`.
+- Next.js storefront wired to Medusa through `apps/storefront/src/lib/medusa`.
+- Medusa backend configured for PostgreSQL.
+- Env templates exist for shared, backend, and storefront setup.
+- Demo seed script exists.
 
-**Hosting note:** If zero paid hosting is required, keep the storefront on Vercel, host the Medusa application on Render, and use Neon for PostgreSQL. Do not switch this stack to a fully Vercel-only or Netlify-only deployment unless the backend architecture changes away from self-hosted Medusa.
+Guardrails:
+- No hardcoded secrets or deploy URLs.
+- No direct Medusa calls from components.
+- No new dependencies without approval.
+- Keep `.env`, `.env.local`, and real `.env.test` secrets out of git.
 
-**Free-tier caveat:** Render Free is acceptable for a prototype, but it can sleep after inactivity and introduce cold starts. Neon Free and Vercel Hobby are also hobby-grade tiers. This stack is suitable for a zero-cost prototype, not a long-term client-facing production deployment.
+## Catalogue Stage - Seeded Catalogue & Product Pages
 
-**Done criteria:**
+Status: implemented, needs continued regression checks.
 
-- `https://your-app.vercel.app` returns a working Next.js page
-- `https://your-backend.onrender.com/health` returns `{ "status": "ok" }`
-- No hardcoded URLs or keys anywhere in source code
+Done-ish:
+- `/products` exists.
+- `/products/[handle]` exists.
+- Catalogue/detail fetches go through `apps/storefront/src/lib/medusa`.
+- Product routes use ISR with a 60-second revalidation window.
+- Product detail can add selected variants to cart.
 
-**Deferred:** All product data, UI, and features
+Known hardening needs:
+- Remove internal phase/demo copy from shopper-facing product UI.
+- Confirm unavailable variant combinations cannot add the wrong variant.
+- Confirm all product images render through `next/image`.
 
----
+Done criteria:
+- Product list loads from Medusa with a valid publishable key.
+- Product detail loads by handle.
+- Missing product handles return a proper not-found state.
+- Empty catalogue and backend unavailable states are handled.
+- Storefront lint, typecheck, and build pass.
 
-## Phase 1 — Seeded Catalogue & Product Pages
+## Phase 2 - Cart & No-Card Simulated Checkout
 
-**Goal:** A real product catalogue is browsable end-to-end.
+Status: verified complete on 2026-05-09.
 
-**What gets built:**
+Checkout truth:
+- Current checkout is intentionally no-card.
+- The checkout must not collect raw card number, expiry, or CVC.
+- Shipping/payment provider selection must come from Medusa data or env-configured provider values.
+- If shipping/payment provider data is unavailable, checkout must fail clearly.
 
-- Seed script populates Medusa with 6–8 products (title, description, price, image URL, category tag)
-- `/products` catalogue page: responsive grid of product cards (image, name, price)
-- `/products/[handle]` detail page: full image, description, price, variant selector, Add to Cart button (non-functional placeholder)
-- `next/image` used on all images; ISR configured with a 60-second revalidation window
-- Basic site layout: header (logo, cart icon), footer
+Done-ish:
+- Cart page exists.
+- Cart provider exists.
+- Quantity update/remove flows exist.
+- Checkout contact/address form exists.
+- Order confirmation page exists.
+- Cart/checkout Store API work is centralized in `apps/storefront/src/lib/medusa/cart.ts`.
 
-**Done criteria:**
+Verified:
+- Live Store API smoke test completed product -> cart -> address -> shipping option -> enabled payment provider -> order without submitting card fields.
+- Shopper-facing phase/internal copy was removed from main shopper routes/components.
+- `corepack pnpm --filter @allpencils/storefront lint` passed.
+- `corepack pnpm --filter @allpencils/storefront typecheck` passed.
+- `corepack pnpm --filter @allpencils/storefront build` passed.
+- `corepack pnpm --filter @allpencils/backend build` passed; local build used fake Redis because `REDIS_URL` was absent.
+- `corepack pnpm --filter @allpencils/backend test:integration:http` passed against disposable local Docker Postgres.
 
-- All seeded products visible at `/products`
-- Each product detail page renders correctly with no layout shift
-- Lighthouse mobile score ≥ 90 on at least one product page
-- No raw `<img>` tags in the codebase
+Done criteria:
+- Cart persists for an anonymous shopper.
+- Add/remove/update quantity works.
+- Checkout creates or updates the cart with email and shipping/billing address.
+- Shipping option selection is data-driven or env-configured.
+- Payment session/provider selection is data-driven or env-configured.
+- Order confirmation can render completed order data.
+- No raw card fields exist in UI or submitted payloads.
 
-**Deferred:** Cart logic, checkout, AI features, homepage hero
+## Phase 3 - Homepage, Simulated Recommendations, Assistant
 
----
+Status: next.
 
-## Phase 2 — Cart & Simulated Checkout
+Current homepage truth:
+- Homepage still uses the bootstrap page.
+- It is not the final hero/featured-products/recommendations experience.
 
-**Goal:** A user can add items to a cart and complete a fake purchase.
+Planned work:
+- Replace bootstrap homepage with final demo storefront homepage.
+- Add simulated recommendation logic after Phase 2 is verified.
+- Add scripted shopping assistant after Phase 2 is verified.
+- Keep all simulated AI local, static, or rule-based.
+- Do not add real AI API calls.
 
-**What gets built:**
+Guardrails:
+- Add new data/script files only when implementing the feature.
+- Do not hardcode assistant copy inside components.
+- Do not claim recommendation or assistant modules exist before they are created.
+- Keep Medusa data fetching inside the service layer.
 
-- Medusa cart API integration: create cart, add line items, update quantities, remove items
-- Cart drawer or `/cart` page showing line items, quantities, and subtotal
-- Stripe test mode integrated via Medusa's Stripe plugin — no live keys
-- `/checkout` page: name, email, address form + Stripe test card element
-- Order confirmation screen with mock order number on successful charge
-- Cart item count badge in the header, updated in real time
+Done criteria:
+- Homepage feels demo-ready and not like an internal build scaffold.
+- Recommendations are deterministic and testable.
+- Assistant copy is data-driven.
+- Empty/error states exist.
+- Frontend lint, typecheck, and build pass.
 
-**Done criteria:**
+## Phase 4 - Visual Polish & Production Readiness
 
-- Full checkout flow completes with test card `4242 4242 4242 4242`
-- Confirmation screen shows and no real charge is made
-- Cart state persists across page navigation within the session
+Status: future.
 
-**Deferred:** User accounts, email confirmation, real payment gateway
+Scope:
+- Responsive QA.
+- Accessibility pass.
+- Empty/loading/error states.
+- Performance review.
+- Image optimization.
+- SEO/meta basics.
+- Remove internal/demo-only UI language.
 
----
+Out of scope unless explicitly requested:
+- Live payments.
+- Accounts/auth.
+- Email.
+- Discounts/promotions.
+- Search.
+- Multi-currency.
+- Multi-language.
 
-## Phase 3 — Homepage, recommendations, and scripted assistant
+Done criteria:
+- Storefront has no obvious placeholder/internal copy.
+- Keyboard/focus behavior is acceptable.
+- Mobile layout works on core routes.
+- Product, cart, checkout, confirmation, and status routes are verified.
+- Builds pass.
 
-**Goal:** The storefront looks complete and the AI features are visible and functional.
+## Phase 5 - Handoff & Deploy Readiness
 
-**What gets built:**
+Status: future.
 
-- Homepage: hero section with headline, subheadline, and CTA; featured products strip; "AI Picks" recommendation row
-- Recommendation logic: a server-side function in `/lib/recommendations.ts` returns related products based on category tag matching; labelled as "Recommended for you" in the UI
-- Shopping assistant widget: fixed-position chat button, opens a chat panel, responses driven by `/data/assistant-script.json`; fallback response for unrecognised input
-- "You might also like" row on each product detail page using the same recommendation function
-- No mention of phases/developer/build-plan in the frontend, should look like a normal ecommerce website
+Scope:
+- Document required env vars.
+- Document local dev and hosted deployment.
+- Verify Render backend health.
+- Verify Vercel storefront status.
+- Verify Neon DB assumptions.
+- Record known cold-start/free-tier behavior if using free hosting.
 
-**Done criteria:**
+Done criteria:
+- `.env.example` and backend template are accurate placeholders only.
+- No secrets committed.
+- Admin bootstrap path is documented without committed credentials.
+- Seed script reruns safely.
+- Production env validation blocks placeholder/default secrets.
+- Human owner knows which dashboard values must be configured.
 
-- All 6 MVP core loop steps complete without error
-- Assistant has ≥5 working scripted exchanges and a graceful fallback
-- "AI Picks" strip visible on homepage with at least 3 products
-- No AI API calls in the codebase — everything is rule-based or scripted
-- No mention of phases/developer/build-plan in the frontend, should look like a normal ecommerce website
+## Current Next Prompt
 
-**Deferred:** Real LLM integration, personalisation based on user history
+```text
+Start at repo root. Read AGENTS.md first and follow it strictly.
 
----
+Mission: start Phase 3 by building the final storefront homepage, deterministic simulated recommendations, and a scripted shopping assistant. Do not add real AI API calls.
 
-## Phase 4 — Polish & Demo Readiness
+Scope:
+1. Preserve existing dirty work; do not revert user changes.
+2. Replace the bootstrap homepage with a polished reusable storefront homepage.
+3. Add deterministic simulated recommendations only after reading existing product/cart data patterns.
+4. Add a scripted/static shopping assistant without external AI calls.
+5. Keep Medusa API calls inside `apps/storefront/src/lib/medusa`.
+6. Keep simulated AI copy/data outside components where practical.
+7. Run required checks:
+   - git status --short
+   - corepack pnpm --filter @allpencils/storefront lint
+   - corepack pnpm --filter @allpencils/storefront typecheck
+   - corepack pnpm --filter @allpencils/storefront build
+8. Report changed files, verification, and any blockers.
 
-**Goal:** The site is presentable to a client with no rough edges.
-
-**What gets built:**
-
-- Responsive layout review across mobile, tablet, and desktop
-- Loading states and error states for all async data fetches
-- Smooth page transitions and cart animations
-- Final Lighthouse audit — fix any remaining Core Web Vitals issues
-- Clean public Vercel URL confirmed, all environment variables verified in production
-- Discount engine (example discount codes)
-
-**Done criteria:**
-
-- Full demo readiness checklist in `docs/mvp.md` ticked off
-- Lighthouse mobile score ≥ 90 on homepage and one product detail page
-- Zero console errors on any page in the core loop
-- Site accessible at a shareable public URL
-- Discount engine (example discount codes)
-
-**Deferred:** Domain name, SEO metadata beyond basics, admin panel refinement
-
-## Phase 5 — Client Handoff Readiness
-
-**Goal:** The site is ready for a client to take over management.
-
-**What gets built:**
-
-- SEO metadata (title, description, Open Graph tags) per page
-- Analytics integration (Google Analytics or similar)
-- Deployment runbook (update step-by-step guide in readme.md for redeploying frontend and backend)
-- Banners and promotional homepage sections
-  - Add reusable homepage/product-page banner blocks with editable text, image, CTA label, and CTA destination.
-  - Prefer admin-editable content through a CMS or custom Medusa admin extension; if that is not implemented, use fixed banner data defined in the codebase.
-  - Ensure each banner links to a product page or collection page.
-  - Provide image size guidance for consistent display.
-
-**Done criteria:**
-
-- All Phase 5 items complete and documented
-- Analytics tracking active on the storefront
-- Deployment runbook is clear and executable
-- Banners are set and navigatable to product pages
-
-**Deferred:** User accounts, email notifications, multi-currency support
+No new dependencies without asking. No real AI API calls. No secrets in output.
+```

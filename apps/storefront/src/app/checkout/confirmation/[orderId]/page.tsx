@@ -33,17 +33,16 @@ export default async function CheckoutConfirmationPage({
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-12 sm:px-10">
         <section className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <Badge>Phase 2</Badge>
-            <Badge variant="secondary">Order placed</Badge>
-            <Badge variant="secondary">Simulated checkout</Badge>
+            <Badge>Order placed</Badge>
+            <Badge variant="secondary">Card-free checkout</Badge>
           </div>
           <div className="space-y-3">
             <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-              Your demo order is confirmed.
+              Your order is confirmed.
             </h1>
             <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-              The live Medusa cart was completed using available shipping and payment
-              options, and the cart session was cleared for the next shopper.
+              Your cart was completed using available shipping and payment options,
+              and the cart session is ready for your next visit.
             </p>
           </div>
         </section>
@@ -53,12 +52,12 @@ export default async function CheckoutConfirmationPage({
             <CardHeader>
               <CardTitle>{formatMockOrderNumber(order.id)}</CardTitle>
               <CardDescription>
-                Friendly demo order number derived from the Medusa order ID.
+                Order reference for your records.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">Medusa order ID</span>
+                <span className="text-muted-foreground">Order ID</span>
                 <span className="font-mono text-xs uppercase tracking-[0.2em]">
                   {order.id}
                 </span>
@@ -88,18 +87,16 @@ export default async function CheckoutConfirmationPage({
 
           <Card className="border-border/70 bg-card/90">
             <CardHeader>
-              <CardTitle>What happened behind the scenes</CardTitle>
+              <CardTitle>Checkout summary</CardTitle>
               <CardDescription>
-                This confirmation came from the live Store API after cart completion.
+                Your order was placed without entering card details.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 text-sm text-muted-foreground">
+              <p>A shipping option was applied automatically.</p>
               <p>
-                A live shipping option returned by Medusa was applied automatically.
-              </p>
-              <p>
-                The checkout used an enabled Medusa payment provider, so no raw card
-                data was collected by the storefront in this phase.
+                The checkout used an enabled payment provider, so no raw card data
+                was collected by the storefront.
               </p>
               {order.items?.length ? (
                 <div className="space-y-3 rounded-2xl border border-border/70 bg-background/50 p-4">
@@ -111,7 +108,7 @@ export default async function CheckoutConfirmationPage({
                     >
                       <div>
                         <p className="text-foreground">{item.title}</p>
-                        <p>{item.subtitle ?? "Demo variant"} x {item.quantity}</p>
+                        <p>{item.subtitle ?? "Selected variant"} x {item.quantity}</p>
                       </div>
                     </div>
                   ))}
@@ -137,14 +134,14 @@ export default async function CheckoutConfirmationPage({
           <CardHeader>
             <CardTitle>Order confirmation unavailable</CardTitle>
             <CardDescription>
-              The storefront could not retrieve this order from Medusa right now.
+              The storefront could not retrieve this order right now.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
               {error instanceof Error
                 ? error.message
-                : "The confirmation route is waiting on the live backend."}
+                : "The confirmation route is waiting on the order service."}
             </p>
             <Button asChild>
               <Link href="/products">Back to products</Link>

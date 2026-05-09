@@ -1,116 +1,179 @@
-# AllPencils — Blueprint
+# AllPencils Blueprint
 
-> Stable reference document. Update only when a foundational decision changes.
+## Product
 
----
+AllPencils is a reusable ecommerce storefront template, currently demoed as a pencil shop. It should prove that a client can get a polished storefront backed by Medusa, then swap catalogue and branding later.
 
-## 1. Product Vision
+Current build stage: **Phase 2 hardening - cart and no-card simulated checkout**.
 
-AllPencils is a reusable ecommerce storefront template, demoed as a pencil shop, designed to be sold to clients who want a fast, SEO-optimised, professionally designed online store. The product's value proposition to clients is threefold: it looks premium, it loads fast enough to rank well on Google, and it can be handed off with a working admin panel so the client manages their own catalogue.
+## Architecture
 
-The current build is a **clickable prototype** aimed at winning a paying client. The underlying architecture is real, not throwaway — every decision made here should hold as the product evolves into a full-production template.
+| Area | Current choice |
+| --- | --- |
+| Storefront | Next.js 14 App Router, TypeScript |
+| Styling | Tailwind CSS and shadcn/ui |
+| Backend | Medusa.js v2 |
+| Database | PostgreSQL, Neon for hosted environments |
+| Frontend hosting | Vercel |
+| Backend hosting | Render |
+| Checkout | No-card simulated checkout using Medusa provider data |
+| AI | Planned simulated features only |
 
----
+Hosting is split by design:
+- Vercel runs the storefront.
+- Render runs the Medusa backend.
+- Neon stores backend data.
 
-## 2. Architecture Decisions
+Do not propose a different hosting topology unless the user asks to change architecture.
 
-### Frontend
+## Storefront Boundaries
 
-- **Framework:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS + shadcn/ui component library
-- **Hosting:** Vercel
+Components must not call Medusa endpoints directly.
 
-Next.js is the correct choice here for three reasons: it renders pages server-side by default (critical for SEO and Core Web Vitals), it integrates natively with Vercel for zero-config deployment, and it handles image optimisation out of the box via `next/image`.
+Allowed flow:
 
-### Backend / Ecommerce Engine
+```text
+route/component -> apps/storefront/src/lib/medusa/* -> Medusa Store API -> backend -> PostgreSQL
+```
 
-- **Platform:** Medusa.js v2 (self-hosted)
-- **Hosting:** Render
-- **Database:** PostgreSQL (Neon-managed for demo)
+Important files:
+- `apps/storefront/src/app` - App Router routes.
+- `apps/storefront/src/components` - reusable UI and commerce components.
+- `apps/storefront/src/lib/medusa` - Medusa service layer.
+- `apps/storefront/src/lib/medusa/cart.ts` - cart, shipping, payment, completion helpers.
+- `apps/storefront/src/app/globals.css` - global design tokens and Tailwind base.
 
-Medusa provides a production-grade ecommerce data model — products, variants, cart, orders, customers — without building any of it manually. Its REST API is consumed by the Next.js frontend. For the demo, a small seed script will populate under 10 products.
+## Backend Boundaries
 
-The hosting split is intentional. Medusa's application is a separate Node.js server plus Admin dashboard backed by PostgreSQL, and Medusa's deployment guidance assumes a provider that supports Node.js server deployments with enough memory for the app and admin. Vercel and Netlify remain storefront platforms in this project, not the home for the Medusa application.
+Important files:
+- `apps/backend/medusa-config.ts` - Medusa runtime config.
+- `apps/backend/src/lib/env.ts` - backend env validation.
+- `apps/backend/src/scripts/seed.ts` - demo seed data and inventory.
+- `apps/backend/src/scripts/create-admin.ts` - admin bootstrap helper.
+- `apps/backend/src/api` - custom backend routes.
+- `apps/backend/integration-tests` - backend tests.
 
-For a zero-cost prototype, the backend can run on Render Free and the database can live on Neon Free. This is a pragmatic workaround when Railway requires payment, but it carries real tradeoffs: Render Free can sleep after inactivity and introduce cold starts, and the free tiers across all providers should be treated as prototype infrastructure rather than a stable long-term client deployment target.
+Use Medusa workflows/services where practical. Avoid raw database access unless there is a clear reason.
 
-### Caching & Performance
+## Environment Surfaces
 
-- Next.js ISR (Incremental Static Regeneration) for product and category pages — pages are statically generated and revalidated on a schedule, not on every request.
-- `next/image` for automatic WebP conversion and lazy loading.
-- Vercel's Edge Network handles CDN distribution globally.
-- No additional caching layer is required for the demo phase.
+Shared:
+- `.env.example` documents placeholders only.
 
-### "AI" Features (Simulated)
+Storefront:
+- `apps/storefront/.env.local` for local runtime values.
+- Vercel dashboard for hosted values.
 
-Both AI-facing features are pre-programmed for the demo and do not call any external AI API.
+Backend:
+- `apps/backend/.env.template` for local placeholders.
+- `apps/backend/.env` for local secrets.
+- `apps/backend/.env.test` for disposable test database values.
+- Render dashboard for hosted values.
 
-- **Product Recommendations:** A rule-based function returns a fixed set of related products based on category tag matching. Presented in the UI as "Recommended for you."
-- **Shopping Assistant:** A pre-scripted chat widget with branching responses mapped to common shopping questions (e.g. "What's your bestseller?", "Do you offer bulk orders?"). Responses are hardcoded in a JSON config file, making them trivially replaceable with a real LLM call in a later phase.
+Rules:
+- No secrets in source or docs.
+- No committed real `.env`, `.env.local`, or `.env.test`.
+- No hardcoded deploy URLs in source.
+- Production/non-test backend runtime must not use placeholder/default JWT or cookie secrets.
+- `REDIS_URL` absence can mean local fake Redis fallback. That is not production-ready.
 
-### Data Layer
+## Current Phase Truth
 
-- Medusa's PostgreSQL database is the source of truth for all product, cart, and order data.
-- No external CMS is used at this stage. Product copy lives in the database and is managed through the Medusa Admin panel.
+Implemented or done-ish:
+- Product list route.
+- Product detail route.
+- ISR for product/catalogue routes.
+- Anonymous cart.
+- Quantity updates.
+- Checkout address/contact form.
+- No-card checkout.
+- Order confirmation.
 
-### Admin Panel
+Not implemented:
+- Final homepage.
+- Simulated recommendation feature.
+- Scripted assistant feature.
+- Full visual polish pass.
+- Full production verification record.
 
-- Medusa ships with a built-in admin dashboard (`@medusajs/admin`). This is deployed alongside the backend and gives the client a UI to manage products, inventory, and orders. It is not the focus of the demo but will be shown briefly to illustrate handoff capability.
+Known shopper-facing cleanup:
+- Remove phase/internal demo copy from routes and components.
+- Keep checkout clear that it is no-card simulated checkout without collecting sensitive card data.
 
----
+## Checkout Contract
 
-## 3. What This System Is NOT Doing
+Current checkout is not a card payment UI.
 
-The following are explicitly out of scope and should not be built, referenced, or planned for until a separate decision is made:
+Must:
+- Use Medusa shipping/payment provider data or env-configured provider values.
+- Fail clearly when required provider data is unavailable.
+- Avoid raw card number, expiry, and CVC fields.
+- Avoid logging provider secrets, token values, or publishable key values.
 
-- Real payment processing (no Stripe, PayPal, or any live gateway)
-- User accounts, login, or order history
-- Email notifications or transactional email
-- Discount codes or promotions engine
-- Multi-currency or multi-language support
-- Mobile app or PWA
-- Real AI/LLM API calls
-- Custom CMS or headless CMS integration
-- Shopify or any paid ecommerce platform
+Must not:
+- Add fake card inputs.
+- Claim live payment readiness.
+- Enable live Stripe keys without explicit instruction.
 
----
+## Seed Contract
 
-## 4. Hard Rules the Codebase Must Follow
+Seed scripts may contain demo catalogue constants because they are data setup files.
 
-1. **No hardcoded values in source code.** API URLs, keys, and environment-specific config belong in `.env` files only.
-2. **No direct AI provider calls from the client.** All AI or simulated-AI logic runs server-side or from a Next.js API route.
-3. **No inline styles.** All styling goes through Tailwind utility classes or shadcn/ui components.
-4. **Images must use `next/image`.** No raw `<img>` tags. This is non-negotiable for Core Web Vitals.
-5. **All Medusa API calls are abstracted behind a service layer** (`/lib/medusa/`) so the frontend never calls Medusa endpoints directly from components.
-6. **TypeScript throughout.** No `.js` files in the Next.js project.
-7. **The shopping assistant script lives in a single config file** (`/data/assistant-script.json`). No hardcoded chat strings in components.
+Seed must:
+- Be idempotent.
+- Repair partial prior runs where practical.
+- Avoid duplicate regions, tax regions, stock locations, fulfillment sets, shipping options, API key links, categories, products, and inventory.
+- Avoid logging publishable key/token values.
+- Be run only against the intended database.
 
----
+## Planned Phase 3
 
-## 5. How the Product Evolves in Layers
+Phase 3 starts only after Phase 2 hardening passes or blockers are explicitly deferred.
 
-| Layer                             | What It Delivers                                                                               |
-| --------------------------------- | ---------------------------------------------------------------------------------------------- |
-| **Layer 1 — Demo**                | Storefront, simulated AI, test checkout, seeded catalogue, deployed on Vercel + Render + Neon  |
-| **Layer 2 — Client Handoff**      | Real payment gateway, admin panel polish, product import tooling, domain setup                 |
-| **Layer 3 — Production Template** | Full order management, email notifications, discount engine, user accounts                     |
-| **Layer 4 — AI Upgrade**          | Replace simulated assistant with real LLM (e.g. Claude API); real personalised recommendations |
+Planned work:
+- Final homepage.
+- Simulated recommendations.
+- Scripted assistant.
 
-Each layer must be fully stable before beginning the next.
+Constraints:
+- No real AI APIs.
+- Recommendation logic must be local and deterministic.
+- Assistant copy must live in data/config, not component literals.
+- New modules/files should be created only when implementing the features.
 
----
+## Verification Defaults
 
-## 6. Decision Summary
+Storefront-only:
 
-| Decision           | Choice                   | Reason                                             |
-| ------------------ | ------------------------ | -------------------------------------------------- |
-| Frontend framework | Next.js 14               | SSR/ISR for SEO; native Vercel deployment          |
-| Styling            | Tailwind + shadcn/ui     | Fast to build, professional output                 |
-| Ecommerce engine   | Medusa.js v2             | Full data model without custom build; open source  |
-| Frontend hosting   | Vercel                   | Best fit for Next.js storefront deployment         |
-| Backend hosting    | Render                   | Zero-cost Node hosting path for the Medusa app     |
-| Database           | Neon Postgres            | Zero-cost PostgreSQL path for the prototype        |
-| AI features        | Simulated (pre-scripted) | Saves time; swap-in ready for real LLM later       |
-| Payments           | Stripe test mode         | No real transactions needed for demo               |
-| Admin panel        | Medusa Admin (built-in)  | Client self-service; no custom build needed        |
-| TypeScript         | Yes                      | Catches errors early; required for maintainability |
+```powershell
+corepack pnpm --filter @allpencils/storefront lint
+corepack pnpm --filter @allpencils/storefront typecheck
+```
+
+Run storefront build when route/data/env behavior changes:
+
+```powershell
+corepack pnpm --filter @allpencils/storefront build
+```
+
+Backend-only:
+
+```powershell
+corepack pnpm --filter @allpencils/backend build
+```
+
+Backend integration HTTP:
+
+```powershell
+corepack pnpm --filter @allpencils/backend test:integration:http
+```
+
+If integration tests are blocked, report exact `.env.test` or disposable Postgres blocker.
+
+Docs-only:
+
+```powershell
+git diff -- AGENTS.md docs
+```
+
+Then run stale-claim and mojibake searches requested by the active task. Treat historical phase headings differently from stale "current phase" claims.

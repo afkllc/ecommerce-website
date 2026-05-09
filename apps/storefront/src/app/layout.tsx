@@ -21,7 +21,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "AllPencils",
-  description: "Local bootstrap checkpoint for the AllPencils storefront template.",
+  description: "Shop pencils and stationery essentials from AllPencils.",
 }
 
 export default function RootLayout({

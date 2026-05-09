@@ -45,7 +45,7 @@ export default function CartPage() {
           <CardHeader>
             <CardTitle>Loading cart</CardTitle>
             <CardDescription>
-              Pulling your saved cart from the Medusa storefront.
+              Restoring your saved cart.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -58,8 +58,8 @@ export default function CartPage() {
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12 sm:px-10">
         <section className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <Badge>Phase 2</Badge>
-            <Badge variant="secondary">Anonymous cart</Badge>
+            <Badge>Cart</Badge>
+            <Badge variant="secondary">Ready when you are</Badge>
           </div>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
             Your cart is ready whenever you are.
@@ -70,7 +70,7 @@ export default function CartPage() {
           <CardHeader>
             <CardTitle>No items yet</CardTitle>
             <CardDescription>
-              Add a product from the catalogue to start the simulated checkout flow.
+              Add a product from the catalogue to start checkout.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap items-center gap-3">
@@ -90,8 +90,7 @@ export default function CartPage() {
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12 sm:px-10">
       <section className="space-y-4">
         <div className="flex flex-wrap gap-2">
-          <Badge>Phase 2</Badge>
-          <Badge variant="secondary">Cart</Badge>
+          <Badge>Cart</Badge>
           <Badge variant="secondary">{itemCount} item{itemCount === 1 ? "" : "s"}</Badge>
         </div>
         <div className="space-y-2">
@@ -99,8 +98,8 @@ export default function CartPage() {
             Review your cart before checkout.
           </h1>
           <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-            Quantities, subtotals, and cart persistence all come from the live Medusa
-            cart APIs through the storefront service layer.
+            Adjust quantities, remove items, or continue to checkout when your
+            selection looks right.
           </p>
         </div>
       </section>
@@ -128,7 +127,7 @@ export default function CartPage() {
                       <div className="space-y-1">
                         <h2 className="text-xl font-semibold">{item.title}</h2>
                         <p className="text-sm text-muted-foreground">
-                          {item.variant_title ?? "Demo variant"}
+                          {item.variant_title ?? "Selected variant"}
                         </p>
                         {item.product_handle ? (
                           <Link
@@ -196,8 +195,7 @@ export default function CartPage() {
           <CardHeader>
             <CardTitle>Cart summary</CardTitle>
             <CardDescription>
-              Shipping is selected automatically in the next step using the verified
-              live default method.
+              Shipping is applied in the next step from available delivery options.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
