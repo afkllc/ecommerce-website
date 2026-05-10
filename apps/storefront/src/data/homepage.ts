@@ -1,19 +1,19 @@
 import { BookOpen, BriefcaseBusiness, Brush, Gauge, Layers3, Sparkles } from "lucide-react"
 
 export const homepageHero = {
-  eyebrow: "Specialist pencil store",
-  title: "Pencils for sketching, study, and focused work.",
+  eyebrow: "Premium storefront template",
+  title: "A cinematic product shop built to feel bespoke.",
   description:
-    "Choose precise graphite, color, and everyday pencils by the way you use them: studio work, school notes, or clear daily thinking.",
+    "AllPencils pairs a luxury product hero with guided commerce, so buyers see the craft before they reach the catalogue.",
   primaryCta: {
-    label: "Shop pencils",
+    label: "Shop the collection",
     href: "/products",
   },
   secondaryCta: {
-    label: "Find your fit",
+    label: "Explore guided picks",
     href: "#assistant",
   },
-  highlights: ["Artist-ready grades", "School-safe staples", "Workday essentials"],
+  highlights: ["3D product theatre", "Guided buying paths", "No-card checkout demo"],
 }
 
 export const useCases = [
