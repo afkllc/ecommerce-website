@@ -27,9 +27,10 @@ The user approved the richer Three.js path:
 
 - `three`
 - `@react-three/fiber`
-- `@react-three/drei`
 
-No GSAP, Framer Motion, Spline, or other new libraries are approved for this pass.
+`@react-three/drei` is intentionally not approved for this pass. The pencil is procedural geometry, so Drei is avoidable unless implementation proves a specific need and the user approves it later.
+
+No GSAP, Framer Motion, Spline, Drei, or other new libraries are approved for this pass.
 
 ## Visual System
 
@@ -164,6 +165,8 @@ The 3D scene receives no Medusa data and makes no network calls.
 - Keep geometry simple and procedural.
 - Do not ship heavy external model files in this pass.
 - Verify production build size after adding dependencies.
+- Keep all Three.js code inside a client-only dynamic import boundary.
+- Do not import Three.js code into server components.
 
 ## Testing
 
@@ -186,6 +189,14 @@ Browser verification:
 - Cart and checkout still accessible.
 - No console errors.
 
+Performance verification:
+
+- The 3D hero must render fallback content before the canvas paints.
+- The scene must be skipped for `prefers-reduced-motion: reduce`.
+- Pointer parallax applies only on pointer/fine devices.
+- Mobile hero must not hide the next ecommerce section completely.
+- Build output must be reviewed for obvious bundle growth.
+
 ## Out Of Scope
 
 - Spline embed.
@@ -194,6 +205,7 @@ Browser verification:
 - Live payment fields.
 - New backend work.
 - GSAP or Framer Motion.
+- `@react-three/drei` unless a later plan names a specific required feature and gets approval.
 - External 3D model marketplace files.
 
 ## Risks
