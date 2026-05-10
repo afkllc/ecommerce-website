@@ -12,14 +12,14 @@ export function UseCaseGrid({ items }: UseCaseGridProps) {
   return (
     <section className="space-y-5">
       <div className="max-w-2xl space-y-2">
-        <p className="text-xs font-medium uppercase text-primary">Shop by use</p>
+        <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">Shop by use</p>
         <h2 className="text-3xl font-semibold sm:text-4xl">
-          Start with how you use your pencil.
+          Shop by the work your pencil needs to do.
         </h2>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {items.map(({ id, title, description, href, icon: Icon, tags }) => (
-          <Card key={id} className="rounded-lg border-border/70 bg-card/90">
+          <Card key={id} className="clip-chamfer border-border/70 bg-card/90 transition-transform hover:-translate-y-1">
             <CardHeader className="gap-4">
               <div className="flex size-10 items-center justify-center rounded-lg border border-border/60 bg-background">
                 <Icon className="size-4 text-primary" />

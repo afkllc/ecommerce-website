@@ -1,7 +1,6 @@
 import Link from "next/link"
 
 import { ProductCard } from "@/components/product-card"
-import { Button } from "@/components/ui/button"
 import type { StoreProduct } from "@/lib/medusa"
 
 type FeaturedProductRailProps = {
@@ -25,12 +24,15 @@ export function FeaturedProductRail({
             Featured pencils
           </p>
           <h2 className="text-3xl font-semibold sm:text-4xl">
-            Reliable starting points from the catalogue.
+            Selected products that show the template in motion.
           </h2>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/products">View catalogue</Link>
-        </Button>
+        <Link
+          href="/products"
+          className="w-fit border-b border-primary py-2 text-sm font-medium text-primary transition-colors hover:text-foreground"
+        >
+          View catalogue
+        </Link>
       </div>
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {products.map((product) => (

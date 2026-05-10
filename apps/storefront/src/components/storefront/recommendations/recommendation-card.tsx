@@ -23,7 +23,7 @@ export function RecommendationCard({
   const audience = product.metadata?.audience ?? product.categories?.[0]?.name ?? "Pencil"
 
   return (
-    <Card className="h-full overflow-hidden rounded-lg border-border/70 bg-card/90 transition-transform hover:-translate-y-0.5">
+    <Card className="clip-chamfer h-full overflow-hidden border-border/70 bg-card/90 transition-transform hover:-translate-y-0.5">
       <Link href={`/products/${product.handle}`} className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           {image ? (
