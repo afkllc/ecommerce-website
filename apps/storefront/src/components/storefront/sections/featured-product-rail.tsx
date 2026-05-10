@@ -24,12 +24,12 @@ export function FeaturedProductRail({
             Featured pencils
           </p>
           <h2 className="text-3xl font-semibold sm:text-4xl">
-            Selected products that show the template in motion.
+            Selected pencils that show the collection in motion.
           </h2>
         </div>
         <Link
           href="/products"
-          className="w-fit border-b border-primary py-2 text-sm font-medium text-primary transition-colors hover:text-foreground"
+          className="w-fit border-b border-primary py-2 text-sm font-medium text-primary transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
         >
           View catalogue
         </Link>
