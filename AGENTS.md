@@ -92,35 +92,6 @@ Out of scope unless explicitly instructed:
 
 ---
 
-## Next Developer-Agent Prompt
-
-Use this after docs refresh:
-
-```text
-Start at repo root. Read AGENTS.md first and follow it strictly.
-
-Mission: finish Phase 2 hardening before any Phase 3 feature work. Do not add homepage AI/recommendations/assistant yet.
-
-Scope:
-1. Verify current cart and no-card checkout flow end-to-end against the live Medusa backend.
-2. Remove phase/internal demo copy from shopper-facing UI where it appears in routes/components.
-3. Confirm product list/detail ISR still works through apps/storefront/src/lib/medusa only.
-4. Confirm checkout does not collect raw card number, expiry, or CVC.
-5. Confirm shipping/payment provider selection is data-driven/env-configured and fails clearly when unavailable.
-6. Run required checks:
-   - git status --short
-   - corepack pnpm --filter @allpencils/storefront lint
-   - corepack pnpm --filter @allpencils/storefront typecheck
-   - corepack pnpm --filter @allpencils/storefront build
-   - corepack pnpm --filter @allpencils/backend build
-   - corepack pnpm --filter @allpencils/backend test:integration:http, or report exact .env.test/Postgres blocker
-7. Report whether Phase 2 can be marked complete. If not, list exact blockers.
-
-No new features. No new dependencies without asking. No secrets in output.
-```
-
----
-
 ## Skills & Activation
 
 Available local skills may include:
