@@ -16,7 +16,7 @@ type LuxuryHeroProps = {
 
 export function LuxuryHero({ hero }: LuxuryHeroProps) {
   return (
-    <section className="relative isolate -mx-6 overflow-hidden atelier-surface px-6 text-[#f8ecd8] sm:-mx-10 sm:px-10">
+    <section className="relative isolate overflow-hidden atelier-surface px-6 text-[#f8ecd8] sm:px-10">
       <PencilSceneLoader />
       <div className="absolute inset-0 z-10 bg-[linear-gradient(90deg,oklch(0.16_0.02_65/0.98),oklch(0.16_0.02_65/0.74)_46%,oklch(0.16_0.02_65/0.16))]" />
       <div className="relative z-20 mx-auto grid min-h-[540px] max-w-6xl items-center gap-8 py-12 sm:min-h-[620px] lg:min-h-[660px] lg:grid-cols-[0.95fr_1.05fr] lg:py-16">
